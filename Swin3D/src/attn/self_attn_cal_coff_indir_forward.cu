@@ -182,7 +182,7 @@ std::vector<torch::Tensor> self_attn_cal_coff_cuda_forward_indir(
     
     const dim3 blocks((total_size + NUM_THREADS - 1) / NUM_THREADS);
 
-    AT_DISPATCH_FLOATING_TYPES_AND_HALF(coffs.type(), "coff_self_attn_kernel_forward", ([&] {
+    AT_DISPATCH_FLOATING_TYPES_AND_HALF(coffs.scalar_type(), "coff_self_attn_kernel_forward", ([&] {
         self_attn_cal_coff_cuda_forward_indir_kernel<<<blocks, NUM_THREADS>>>(
             query_feats.data_ptr<scalar_t>(),
             key_feats.data_ptr<scalar_t>(),

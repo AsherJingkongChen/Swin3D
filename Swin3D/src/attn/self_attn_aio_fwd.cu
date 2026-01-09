@@ -306,7 +306,7 @@ torch::Tensor cal_max_coffs(
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
 
-        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.type(), "cal_coff_raw_max_kernel_dir", ([&] {
+        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "cal_coff_raw_max_kernel_dir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
             
             switch(num_dim)
@@ -381,7 +381,7 @@ torch::Tensor cal_max_coffs(
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
 
-        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.type(), "cal_coff_raw_max_kernel_indir", ([&] {
+        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "cal_coff_raw_max_kernel_indir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
 
             switch(num_dim)
@@ -512,7 +512,7 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
 
-        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.type(), "self_attn_cuda_forward_kernel_dir", ([&] {
+        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "self_attn_cuda_forward_kernel_dir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
 
             switch(num_dim)
@@ -602,7 +602,7 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
 
-        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.type(), "self_attn_cuda_forward_kernel_indir", ([&] {
+        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "self_attn_cuda_forward_kernel_indir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
 
             switch(num_dim)

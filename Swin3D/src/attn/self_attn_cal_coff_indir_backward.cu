@@ -225,7 +225,7 @@ std::vector<torch::Tensor> self_attn_cal_coff_cuda_backward_indir(
     
     const dim3 blocks((total_size + NUM_THREADS - 1) / NUM_THREADS);
 
-    AT_DISPATCH_FLOATING_TYPES_AND_HALF(coff_grads.type(), "coff_self_attn_kernel_backward", ([&] {
+    AT_DISPATCH_FLOATING_TYPES_AND_HALF(coff_grads.scalar_type(), "coff_self_attn_kernel_backward", ([&] {
         self_attn_cal_coff_cuda_backward_indir_kernel<<<blocks, NUM_THREADS>>>(
             coff_grads.data_ptr<scalar_t>(),
             query_feats.data_ptr<scalar_t>(),

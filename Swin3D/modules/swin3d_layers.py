@@ -5,14 +5,9 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from timm.models.layers import DropPath, trunc_normal_
-import MinkowskiEngine as ME
-from MinkowskiEngine import SparseTensor
-from Swin3D.modules.mink_layers import (
-    assign_feats,
-    SparseTensorLayerNorm,
-    SparseTensorLinear,
-)
+from torch import Tensor
+from torch.nn.init import trunc_normal_
+from torchvision.ops import stochastic_depth
 from Swin3D.sparse_dl.attn.attn_coff import (
     SelfAttnAIOFunction,
     PosEmb,
@@ -20,8 +15,33 @@ from Swin3D.sparse_dl.attn.attn_coff import (
     IndexMode,
     PrecisionMode,
 )
-import Swin3D.sparse_dl.knn
 from Swin3D.sparse_dl.knn import KNN
+
+try:
+    import MinkowskiEngine as ME
+    from MinkowskiEngine import SparseTensor
+    from Swin3D.modules.mink_layers import (
+        assign_feats,
+        SparseTensorLayerNorm,
+        SparseTensorLinear,
+    )
+except ImportError:
+    ME = None
+    SparseTensor = None
+    assign_feats = None
+    SparseTensorLayerNorm = None
+    SparseTensorLinear = None
+
+
+class DropPath(nn.Module):
+    """Stochastic depth (drop path) regularization."""
+
+    def __init__(self, drop_prob: float = 0.0) -> None:
+        super().__init__()
+        self.drop_prob = drop_prob
+
+    def forward(self, x: Tensor) -> Tensor:
+        return stochastic_depth(x, self.drop_prob, mode="row", training=self.training)
 
 
 def query_knn_feature(

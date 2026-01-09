@@ -4,7 +4,11 @@
 """
 from . import sparse_dl
 from . import modules
-from . import models
+
+try:
+    from . import models
+except ImportError:
+    models = None
 
 __version__ = '1.0.0'
 

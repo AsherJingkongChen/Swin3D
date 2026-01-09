@@ -213,7 +213,7 @@ torch::Tensor cal_exp_sum_grads(
     total_size = at::ScalarType::Half == value_feats.scalar_type() ? (total_size / 2) : total_size;
     const dim3 blocks_s1((total_size + NUM_THREADS - 1) / NUM_THREADS);
 
-    AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.type(), "self_attn_cuda_s1_backward_kernel", ([&] {
+    AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "self_attn_cuda_s1_backward_kernel", ([&] {
         using accscalar_t = acc_type<scalar_t>;
 
         cal_exp_sum_grad_kernel<scalar_t, accscalar_t><<<blocks_s1, NUM_THREADS>>>(
@@ -290,7 +290,7 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
 
-        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.type(), "self_attn_cuda_backward_kernel_dir", ([&] {
+        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "self_attn_cuda_backward_kernel_dir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
 
             switch(num_dim)
@@ -401,7 +401,7 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
 
-        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.type(), "self_attn_cuda_backward_kernel_indir", ([&] {
+        AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "self_attn_cuda_backward_kernel_indir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
 
             switch(num_dim)
