@@ -5,6 +5,7 @@ Licensed under the MIT License.
 #undef __CUDA_NO_HALF2_OPERATORS__
 
 #include <THC/THCAtomics.cuh>
+#include <c10/cuda/CUDAGuard.h>
 #include <cuda_fp16.h>
 #include "attn_utils.cuh"
 
@@ -147,13 +148,14 @@ std::vector<torch::Tensor> self_attn_apply_coff_cuda_forward_indir(
     CHECK_INPUT(w2n_offsets);
     CHECK_INPUT(n2n_offsets);
     CHECK_INPUT(n_coords);
+    c10::cuda::CUDAGuard guard(value_feats.device());
 
     auto num_attn_voxel = m2w_indices.size(0);
     auto num_head = value_feats.size(1);
     auto num_channel = value_feats.size(2);
 
     auto window_size = value_table.size(1);
-    
+
     auto updated_value_feats = torch::zeros_like(value_feats);
 
     auto total_size = num_attn_voxel * num_head * num_channel;

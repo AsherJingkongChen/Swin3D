@@ -5,6 +5,7 @@ Licensed under the MIT License.
 #undef __CUDA_NO_HALF2_OPERATORS__
 
 #include <THC/THCAtomics.cuh>
+#include <c10/cuda/CUDAGuard.h>
 #include <c10/cuda/CUDAStream.h>
 #include "attn_utils.cuh"
 
@@ -202,6 +203,7 @@ torch::Tensor cal_exp_sum_grads(
     torch::Tensor value_table
 )
 {
+    c10::cuda::CUDAGuard guard(value_feats.device());
     auto num_voxel = value_feats.size(0);
     auto num_head = value_feats.size(1);
     auto num_channel = value_feats.size(2);
@@ -257,6 +259,7 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
     CHECK_INPUT(query_table);
     CHECK_INPUT(key_table);
     CHECK_INPUT(value_table);
+    c10::cuda::CUDAGuard guard_bwd(query_feats.device());
 
     auto num_attn_voxel = s_indices[0].size(0);
     auto num_voxel = value_feats.size(0);

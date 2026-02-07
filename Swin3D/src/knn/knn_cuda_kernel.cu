@@ -1,3 +1,4 @@
+#include <c10/cuda/CUDAGuard.h>
 #include "cuda_utils.cuh"
 #include "knn_cuda_kernel.h"
 
@@ -219,6 +220,7 @@ void knn_cuda(
     CHECK_INPUT(query_offset);
     CHECK_INPUT(ret_idx);
     CHECK_INPUT(ret_dist);
+    c10::cuda::CUDAGuard guard(src_xyz.device());
 
     auto src_N = src_xyz.size(0);
     auto query_N = query_xyz.size(0);

@@ -5,6 +5,7 @@ Licensed under the MIT License.
 #undef __CUDA_NO_HALF2_OPERATORS__
 
 #include <THC/THCAtomics.cuh>
+#include <c10/cuda/CUDAGuard.h>
 #include <c10/cuda/CUDAStream.h>
 #include <cuda_fp16.h>
 #include "attn_utils.cuh"
@@ -273,6 +274,7 @@ torch::Tensor cal_max_coffs(
     CHECK_INPUT(query_table);
     CHECK_INPUT(key_table);
     CHECK_INPUT(value_table);
+    c10::cuda::CUDAGuard guard(query_feats.device());
 
     auto num_attn_voxel = s_indices[0].size(0);
     auto num_voxel = value_feats.size(0);
@@ -476,6 +478,7 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
     CHECK_INPUT(key_table);
     CHECK_INPUT(value_table);
     CHECK_INPUT(max_coffs);
+    c10::cuda::CUDAGuard guard(query_feats.device());
 
     auto num_attn_voxel = s_indices[0].size(0);
     auto num_voxel = value_feats.size(0);

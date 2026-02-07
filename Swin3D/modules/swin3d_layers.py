@@ -2,9 +2,9 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 """
-import numpy as np
 import torch
 import torch.nn as nn
+from math import prod
 from torch import Tensor
 from torch.nn.init import trunc_normal_
 from torchvision.ops import stochastic_depth
@@ -460,7 +460,7 @@ class WindowAttention(nn.Module):
             trunc_normal_(self.key_xyz_table, std=0.02)
             self.value_xyz_table = nn.Parameter(torch.zeros(table_shape_xyz))
             trunc_normal_(self.value_xyz_table, std=0.02)
-            table_offsets += [np.prod(table_shape_xyz[1:])] * 3
+            table_offsets += [prod(table_shape_xyz[1:])] * 3
 
         if "RGB" in cRSE:
             self.color_quant_size = quant_size * 2
@@ -472,7 +472,7 @@ class WindowAttention(nn.Module):
             trunc_normal_(self.key_rgb_table, std=0.02)
             self.value_rgb_table = nn.Parameter(torch.zeros(table_shape_rgb))
             trunc_normal_(self.value_rgb_table, std=0.02)
-            table_offsets += [np.prod(table_shape_rgb[1:])] * 3
+            table_offsets += [prod(table_shape_rgb[1:])] * 3
 
         if "NORM" in cRSE:
             self.normal_quant_size = quant_size * 2
@@ -484,9 +484,13 @@ class WindowAttention(nn.Module):
             trunc_normal_(self.key_norm_table, std=0.02)
             self.value_norm_table = nn.Parameter(torch.zeros(table_shape_norm))
             trunc_normal_(self.value_norm_table, std=0.02)
-            table_offsets += [np.prod(table_shape_norm[1:])] * 3
+            table_offsets += [prod(table_shape_norm[1:])] * 3
 
-        self.table_offsets = table_offsets
+        self.register_buffer(
+            "table_offsets",
+            torch.tensor(table_offsets, dtype=torch.int32),
+            persistent=False,
+        )
 
         self.quant_size = quant_size
 
@@ -528,7 +532,7 @@ class WindowAttention(nn.Module):
         query, key, value = qkv[0], qkv[1], qkv[2]  # [N, num_heads, C//num_heads]
         query = query * self.scale
 
-        table_offsets = torch.IntTensor(self.table_offsets).cuda()
+        table_offsets = self.table_offsets
         query_table, key_table, value_table = [], [], []
         n_cRSE = []
         if "XYZ" in self.cRSE:

@@ -5,6 +5,7 @@ Licensed under the MIT License.
 #undef __CUDA_NO_HALF2_OPERATORS__
 
 #include <THC/THCAtomics.cuh>
+#include <c10/cuda/CUDAGuard.h>
 #include "attn_utils.cuh"
 
 #include "self_attn_apply_coff_indir_backward.h"
@@ -205,13 +206,14 @@ std::vector<torch::Tensor> self_attn_apply_coff_cuda_backward_indir(
     CHECK_INPUT(w2n_offsets);
     CHECK_INPUT(n2n_offsets);
     CHECK_INPUT(n_coords);
+    c10::cuda::CUDAGuard guard(updated_value_grads.device());
 
     auto num_attn_voxel = m2w_indices.size(0);
     auto num_head = value_feats.size(1);
     auto num_channel = value_feats.size(2);
 
     auto window_size = value_table.size(1);
-    
+
     auto value_grads = torch::zeros_like(value_feats);
     auto coff_norm_grads = torch::zeros_like(coff_norm_feats);
     auto value_table_grads = torch::zeros_like(value_table);
