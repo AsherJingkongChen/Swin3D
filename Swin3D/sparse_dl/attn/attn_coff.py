@@ -191,11 +191,12 @@ class SelfAttnAIOFunction(AttnBaseFunction):
     @staticmethod
     def backward(ctx: Any, *grad_outputs: Any) -> Any:
         norm_attn_grads, = grad_outputs
-        sum_coffs, coff_rmax, norm_attn_feats = ctx.saved_tensors[:3]
-        raw_query_feats, raw_key_feats, raw_value_feats = ctx.saved_tensors[3:6]
-        query_table, key_table, value_table = ctx.saved_tensors[6:9]
-        table_offsets = ctx.saved_tensors[9]
-        indices = ctx.saved_tensors[10:]
+        saved = ctx.saved_tensors
+        sum_coffs, coff_rmax, norm_attn_feats = saved[:3]
+        raw_query_feats, raw_key_feats, raw_value_feats = saved[3:6]
+        query_table, key_table, value_table = saved[6:9]
+        table_offsets = saved[9]
+        indices = saved[10:]
 
         pos_emb: PosEmb = getattr(ctx, "pe")
         mode: IndexMode = getattr(ctx, 'mode')
