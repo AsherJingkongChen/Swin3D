@@ -169,8 +169,8 @@ class SelfAttnAIOFunction(AttnBaseFunction):
         qkv_feats = [raw_query_feats, raw_key_feats, raw_value_feats]
         qkv_tables = [query_table, key_table, value_table]
 
-        if torch.is_autocast_enabled() and precision != PrecisionMode.HALF_NONE:
-            c_dtype = torch.get_autocast_gpu_dtype()
+        if torch.is_autocast_enabled('cuda') and precision != PrecisionMode.HALF_NONE:
+            c_dtype = torch.get_autocast_dtype('cuda')
         else:
             c_dtype = torch.float32
 
