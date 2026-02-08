@@ -184,18 +184,25 @@ std::vector<torch::Tensor> self_attn_cal_coff_cuda_forward_indir(
     
     const dim3 blocks((total_size + NUM_THREADS - 1) / NUM_THREADS);
 
+    auto m2w_indices_i = m2w_indices.toType(c10::ScalarType::Int);
+    auto w_elems_i = w_elems.toType(c10::ScalarType::Int);
+    auto w2m_offsets_i = w2m_offsets.toType(c10::ScalarType::Int);
+    auto w2n_offsets_i = w2n_offsets.toType(c10::ScalarType::Int);
+    auto n2n_offsets_i = n2n_offsets.toType(c10::ScalarType::Int);
+    auto n_coords_i = n_coords.toType(c10::ScalarType::Int);
+
     AT_DISPATCH_FLOATING_TYPES_AND_HALF(coffs.scalar_type(), "coff_self_attn_kernel_forward", ([&] {
         self_attn_cal_coff_cuda_forward_indir_kernel<<<blocks, NUM_THREADS>>>(
             query_feats.data_ptr<scalar_t>(),
             key_feats.data_ptr<scalar_t>(),
             query_table.data_ptr<scalar_t>(),
             key_table.data_ptr<scalar_t>(),
-            m2w_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-            w_elems.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-            w2m_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-            w2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-            n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-            n_coords.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
+            m2w_indices_i.data_ptr<int32_t>(),
+            w_elems_i.data_ptr<int32_t>(),
+            w2m_offsets_i.data_ptr<int32_t>(),
+            w2n_offsets_i.data_ptr<int32_t>(),
+            n2n_offsets_i.data_ptr<int32_t>(),
+            n_coords_i.data_ptr<int32_t>(),
             coffs.data_ptr<scalar_t>(),
             pos_bias_method, num_voxel, num_head, num_channel, 
             window_size, total_size

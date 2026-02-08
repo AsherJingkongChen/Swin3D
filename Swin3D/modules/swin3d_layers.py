@@ -170,6 +170,15 @@ def sparse_self_attention(
         return x_offset, y_offset, m2w_indices, w_sizes, w2n_indices, w2m_indices
 
 
+class LayerScale(nn.Module):
+    def __init__(self, dim: int, init_values: float = 1e-5) -> None:
+        super().__init__()
+        self.gamma = nn.Parameter(init_values * torch.ones(dim))
+
+    def forward(self, x: Tensor) -> Tensor:
+        return x * self.gamma
+
+
 class Mlp(nn.Module):
     def __init__(
         self,
@@ -607,6 +616,7 @@ class SwinTransformerBlock(nn.Module):
         window_size,
         quant_size,
         drop_path=0.0,
+        init_values=1e-5,
         mlp_ratio=4.0,
         qkv_bias=True,
         qk_scale=None,
@@ -629,6 +639,7 @@ class SwinTransformerBlock(nn.Module):
             cRSE=cRSE,
             fp16_mode=fp16_mode,
         )
+        self.ls1 = LayerScale(dim, init_values=init_values)
 
         self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
         self.norm2 = norm_layer(dim)
@@ -636,6 +647,7 @@ class SwinTransformerBlock(nn.Module):
         self.mlp = Mlp(
             in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer
         )
+        self.ls2 = LayerScale(dim, init_values=init_values)
 
     def forward(self, feats, attn_args):
         # feats: [N, c]
@@ -643,8 +655,8 @@ class SwinTransformerBlock(nn.Module):
         feats = self.norm1(feats)
         feats = self.attn(feats, attn_args)  # [N, c]
 
-        feats = short_cut + self.drop_path(feats)
-        feats = feats + self.drop_path(self.mlp(self.norm2(feats)))
+        feats = short_cut + self.drop_path(self.ls1(feats))
+        feats = feats + self.drop_path(self.ls2(self.mlp(self.norm2(feats))))
 
         return feats
 

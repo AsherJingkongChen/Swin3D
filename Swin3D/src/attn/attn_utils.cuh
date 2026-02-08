@@ -140,9 +140,9 @@ __device__ __forceinline__ int2 get_qk_offset(int32_t m_idx, const int32_t* m2w_
 
 __device__ __forceinline__ size_t cast_half2(size_t ptr_offset) { return ptr_offset / 2; }
 
-__device__ __forceinline__ int get_global_idx()
+__device__ __forceinline__ int64_t get_global_idx()
 {
-    return threadIdx.x + blockIdx.x * blockDim.x;
+    return (int64_t)threadIdx.x + (int64_t)blockIdx.x * (int64_t)blockDim.x;
 }
 
 __device__ __forceinline__ int3 make_int3(int h)
@@ -325,10 +325,10 @@ public:
 
     int packed_stride;
 
-    int g_idx;
-    int c_idx;
-    int h_idx;
-    int o_idx;
+    int64_t g_idx;
+    int64_t c_idx;
+    int64_t h_idx;
+    int64_t o_idx;
 
 public:
     __device__ IndicesTable(cint32_tp m2w_indices_ptr, cint32_tp w_elems_ptr, 
@@ -350,7 +350,7 @@ public:
         this->num_attns = num_attns;
         this->num_voxel = num_voxel;
         this->packed_stride = packed_stride;
-        this->g_idx = (threadIdx.x + blockIdx.x * blockDim.x) * packed_stride;
+        this->g_idx = ((int64_t)threadIdx.x + (int64_t)blockIdx.x * (int64_t)blockDim.x) * (int64_t)packed_stride;
         this->c_idx = this->g_idx % num_channels;
         this->h_idx = this->g_idx / num_channels % num_heads;
         this->o_idx = this->g_idx / num_channels / num_heads;

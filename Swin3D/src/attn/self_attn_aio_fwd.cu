@@ -307,6 +307,11 @@ torch::Tensor cal_max_coffs(
         CHECK_INPUT(m4k_indices);
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
+        auto table_sizes_i = table_sizes.toType(c10::ScalarType::Int);
+        auto m4q_indices_i = m4q_indices.toType(c10::ScalarType::Int);
+        auto m4k_indices_i = m4k_indices.toType(c10::ScalarType::Int);
+        auto n2n_offsets_i = n2n_offsets.toType(c10::ScalarType::Int);
+        auto n_coords_f = n_coords.toType(c10::ScalarType::Float);
 
         AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "cal_coff_raw_max_kernel_dir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
@@ -319,11 +324,11 @@ torch::Tensor cal_max_coffs(
                     key_feats.data_ptr<scalar_t>(),
                     query_table.data_ptr<scalar_t>(),
                     key_table.data_ptr<scalar_t>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4q_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4k_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m4q_indices_i.data_ptr<int32_t>(),
+                    m4k_indices_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     max_coffs.data_ptr<float>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
                     total_size, packed_stride<accscalar_t>()
@@ -335,11 +340,11 @@ torch::Tensor cal_max_coffs(
                     key_feats.data_ptr<scalar_t>(),
                     query_table.data_ptr<scalar_t>(),
                     key_table.data_ptr<scalar_t>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4q_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4k_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m4q_indices_i.data_ptr<int32_t>(),
+                    m4k_indices_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     max_coffs.data_ptr<float>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
                     total_size, packed_stride<accscalar_t>()
@@ -351,11 +356,11 @@ torch::Tensor cal_max_coffs(
                     key_feats.data_ptr<scalar_t>(),
                     query_table.data_ptr<scalar_t>(),
                     key_table.data_ptr<scalar_t>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4q_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4k_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m4q_indices_i.data_ptr<int32_t>(),
+                    m4k_indices_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     max_coffs.data_ptr<float>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
                     total_size, packed_stride<accscalar_t>()
@@ -382,6 +387,13 @@ torch::Tensor cal_max_coffs(
         CHECK_INPUT(w2n_offsets);
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
+        auto table_sizes_i = table_sizes.toType(c10::ScalarType::Int);
+        auto m2w_indices_i = m2w_indices.toType(c10::ScalarType::Int);
+        auto w_elems_i = w_elems.toType(c10::ScalarType::Int);
+        auto w2m_offsets_i = w2m_offsets.toType(c10::ScalarType::Int);
+        auto w2n_offsets_i = w2n_offsets.toType(c10::ScalarType::Int);
+        auto n2n_offsets_i = n2n_offsets.toType(c10::ScalarType::Int);
+        auto n_coords_f = n_coords.toType(c10::ScalarType::Float);
 
         AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "cal_coff_raw_max_kernel_indir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
@@ -394,13 +406,13 @@ torch::Tensor cal_max_coffs(
                     key_feats.data_ptr<scalar_t>(),
                     query_table.data_ptr<scalar_t>(),
                     key_table.data_ptr<scalar_t>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m2w_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w_elems.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2m_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m2w_indices_i.data_ptr<int32_t>(),
+                    w_elems_i.data_ptr<int32_t>(),
+                    w2m_offsets_i.data_ptr<int32_t>(),
+                    w2n_offsets_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     max_coffs.data_ptr<float>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
                     total_size, packed_stride<accscalar_t>()
@@ -412,13 +424,13 @@ torch::Tensor cal_max_coffs(
                     key_feats.data_ptr<scalar_t>(),
                     query_table.data_ptr<scalar_t>(),
                     key_table.data_ptr<scalar_t>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m2w_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w_elems.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2m_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m2w_indices_i.data_ptr<int32_t>(),
+                    w_elems_i.data_ptr<int32_t>(),
+                    w2m_offsets_i.data_ptr<int32_t>(),
+                    w2n_offsets_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     max_coffs.data_ptr<float>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
                     total_size, packed_stride<accscalar_t>()
@@ -430,13 +442,13 @@ torch::Tensor cal_max_coffs(
                     key_feats.data_ptr<scalar_t>(),
                     query_table.data_ptr<scalar_t>(),
                     key_table.data_ptr<scalar_t>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m2w_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w_elems.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2m_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m2w_indices_i.data_ptr<int32_t>(),
+                    w_elems_i.data_ptr<int32_t>(),
+                    w2m_offsets_i.data_ptr<int32_t>(),
+                    w2n_offsets_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     max_coffs.data_ptr<float>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
                     total_size, packed_stride<accscalar_t>()
@@ -514,6 +526,11 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
         CHECK_INPUT(m4k_indices);
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
+        auto table_sizes_i = table_sizes.toType(c10::ScalarType::Int);
+        auto m4q_indices_i = m4q_indices.toType(c10::ScalarType::Int);
+        auto m4k_indices_i = m4k_indices.toType(c10::ScalarType::Int);
+        auto n2n_offsets_i = n2n_offsets.toType(c10::ScalarType::Int);
+        auto n_coords_f = n_coords.toType(c10::ScalarType::Float);
 
         AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "self_attn_cuda_forward_kernel_dir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
@@ -529,11 +546,11 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
                     key_table.data_ptr<scalar_t>(),
                     value_table.data_ptr<scalar_t>(),
                     max_coffs.data_ptr<float>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4q_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4k_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m4q_indices_i.data_ptr<int32_t>(),
+                    m4k_indices_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     raw_attn_feats.data_ptr<scalar_t>(),
                     sum_coffs.data_ptr<scalar_t>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
@@ -549,11 +566,11 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
                     key_table.data_ptr<scalar_t>(),
                     value_table.data_ptr<scalar_t>(),
                     max_coffs.data_ptr<float>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4q_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4k_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m4q_indices_i.data_ptr<int32_t>(),
+                    m4k_indices_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     raw_attn_feats.data_ptr<scalar_t>(),
                     sum_coffs.data_ptr<scalar_t>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
@@ -569,11 +586,11 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
                     key_table.data_ptr<scalar_t>(),
                     value_table.data_ptr<scalar_t>(),
                     max_coffs.data_ptr<float>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4q_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m4k_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m4q_indices_i.data_ptr<int32_t>(),
+                    m4k_indices_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     raw_attn_feats.data_ptr<scalar_t>(),
                     sum_coffs.data_ptr<scalar_t>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
@@ -604,6 +621,13 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
         CHECK_INPUT(w2n_offsets);
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
+        auto table_sizes_i = table_sizes.toType(c10::ScalarType::Int);
+        auto m2w_indices_i = m2w_indices.toType(c10::ScalarType::Int);
+        auto w_elems_i = w_elems.toType(c10::ScalarType::Int);
+        auto w2m_offsets_i = w2m_offsets.toType(c10::ScalarType::Int);
+        auto w2n_offsets_i = w2n_offsets.toType(c10::ScalarType::Int);
+        auto n2n_offsets_i = n2n_offsets.toType(c10::ScalarType::Int);
+        auto n_coords_f = n_coords.toType(c10::ScalarType::Float);
 
         AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "self_attn_cuda_forward_kernel_indir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
@@ -619,13 +643,13 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
                     key_table.data_ptr<scalar_t>(),
                     value_table.data_ptr<scalar_t>(),
                     max_coffs.data_ptr<float>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m2w_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w_elems.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2m_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m2w_indices_i.data_ptr<int32_t>(),
+                    w_elems_i.data_ptr<int32_t>(),
+                    w2m_offsets_i.data_ptr<int32_t>(),
+                    w2n_offsets_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     raw_attn_feats.data_ptr<scalar_t>(),
                     sum_coffs.data_ptr<scalar_t>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
@@ -641,13 +665,13 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
                     key_table.data_ptr<scalar_t>(),
                     value_table.data_ptr<scalar_t>(),
                     max_coffs.data_ptr<float>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m2w_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w_elems.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2m_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m2w_indices_i.data_ptr<int32_t>(),
+                    w_elems_i.data_ptr<int32_t>(),
+                    w2m_offsets_i.data_ptr<int32_t>(),
+                    w2n_offsets_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     raw_attn_feats.data_ptr<scalar_t>(),
                     sum_coffs.data_ptr<scalar_t>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 
@@ -663,13 +687,13 @@ std::vector<torch::Tensor> self_attn_cuda_forward(
                     key_table.data_ptr<scalar_t>(),
                     value_table.data_ptr<scalar_t>(),
                     max_coffs.data_ptr<float>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m2w_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w_elems.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2m_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m2w_indices_i.data_ptr<int32_t>(),
+                    w_elems_i.data_ptr<int32_t>(),
+                    w2m_offsets_i.data_ptr<int32_t>(),
+                    w2n_offsets_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     raw_attn_feats.data_ptr<scalar_t>(),
                     sum_coffs.data_ptr<scalar_t>(),
                     pos_mode, num_attn_voxel, num_head, num_channel, 

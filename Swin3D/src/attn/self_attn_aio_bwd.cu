@@ -292,6 +292,11 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
         CHECK_INPUT(m4k_indices);
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
+        auto table_sizes_i = table_sizes.toType(c10::ScalarType::Int);
+        auto m4q_indices_i = m4q_indices.toType(c10::ScalarType::Int);
+        auto m4k_indices_i = m4k_indices.toType(c10::ScalarType::Int);
+        auto n2n_offsets_i = n2n_offsets.toType(c10::ScalarType::Int);
+        auto n_coords_f = n_coords.toType(c10::ScalarType::Float);
 
         AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "self_attn_cuda_backward_kernel_dir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
@@ -299,7 +304,7 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
             switch(num_dim)
             {
             case 3:
-                self_attn_cuda_backward_kernel_dir<scalar_t, accscalar_t, 3><<<blocks_s2, NUM_THREADS>>>(  
+                self_attn_cuda_backward_kernel_dir<scalar_t, accscalar_t, 3><<<blocks_s2, NUM_THREADS>>>(
                         normed_out_grads.data_ptr<scalar_t>(),
                         exp_sum_grads.data_ptr<scalar_t>(),
                         exp_sum_feats.data_ptr<scalar_t>(),
@@ -310,11 +315,11 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
                         query_table.data_ptr<scalar_t>(),
                         key_table.data_ptr<scalar_t>(),
                         value_table.data_ptr<scalar_t>(),
-                        table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        m4q_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        m4k_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                        table_sizes_i.data_ptr<int32_t>(),
+                        m4q_indices_i.data_ptr<int32_t>(),
+                        m4k_indices_i.data_ptr<int32_t>(),
+                        n2n_offsets_i.data_ptr<int32_t>(),
+                        n_coords_f.data_ptr<float>(),
                         query_grads.data_ptr<scalar_t>(),
                         key_grads.data_ptr<scalar_t>(),
                         value_grads.data_ptr<scalar_t>(),
@@ -326,7 +331,7 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
                     );
                 break;
             case 6:
-                self_attn_cuda_backward_kernel_dir<scalar_t, accscalar_t, 6><<<blocks_s2, NUM_THREADS>>>(  
+                self_attn_cuda_backward_kernel_dir<scalar_t, accscalar_t, 6><<<blocks_s2, NUM_THREADS>>>(
                         normed_out_grads.data_ptr<scalar_t>(),
                         exp_sum_grads.data_ptr<scalar_t>(),
                         exp_sum_feats.data_ptr<scalar_t>(),
@@ -337,11 +342,11 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
                         query_table.data_ptr<scalar_t>(),
                         key_table.data_ptr<scalar_t>(),
                         value_table.data_ptr<scalar_t>(),
-                        table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        m4q_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        m4k_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                        table_sizes_i.data_ptr<int32_t>(),
+                        m4q_indices_i.data_ptr<int32_t>(),
+                        m4k_indices_i.data_ptr<int32_t>(),
+                        n2n_offsets_i.data_ptr<int32_t>(),
+                        n_coords_f.data_ptr<float>(),
                         query_grads.data_ptr<scalar_t>(),
                         key_grads.data_ptr<scalar_t>(),
                         value_grads.data_ptr<scalar_t>(),
@@ -353,7 +358,7 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
                     );
                 break;
             case 9:
-                self_attn_cuda_backward_kernel_dir<scalar_t, accscalar_t, 9><<<blocks_s2, NUM_THREADS>>>(  
+                self_attn_cuda_backward_kernel_dir<scalar_t, accscalar_t, 9><<<blocks_s2, NUM_THREADS>>>(
                         normed_out_grads.data_ptr<scalar_t>(),
                         exp_sum_grads.data_ptr<scalar_t>(),
                         exp_sum_feats.data_ptr<scalar_t>(),
@@ -364,11 +369,11 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
                         query_table.data_ptr<scalar_t>(),
                         key_table.data_ptr<scalar_t>(),
                         value_table.data_ptr<scalar_t>(),
-                        table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        m4q_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        m4k_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                        n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                        table_sizes_i.data_ptr<int32_t>(),
+                        m4q_indices_i.data_ptr<int32_t>(),
+                        m4k_indices_i.data_ptr<int32_t>(),
+                        n2n_offsets_i.data_ptr<int32_t>(),
+                        n_coords_f.data_ptr<float>(),
                         query_grads.data_ptr<scalar_t>(),
                         key_grads.data_ptr<scalar_t>(),
                         value_grads.data_ptr<scalar_t>(),
@@ -403,6 +408,13 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
         CHECK_INPUT(w2n_offsets);
         CHECK_INPUT(n2n_offsets);
         CHECK_INPUT(n_coords);
+        auto table_sizes_i = table_sizes.toType(c10::ScalarType::Int);
+        auto m2w_indices_i = m2w_indices.toType(c10::ScalarType::Int);
+        auto w_elems_i = w_elems.toType(c10::ScalarType::Int);
+        auto w2m_offsets_i = w2m_offsets.toType(c10::ScalarType::Int);
+        auto w2n_offsets_i = w2n_offsets.toType(c10::ScalarType::Int);
+        auto n2n_offsets_i = n2n_offsets.toType(c10::ScalarType::Int);
+        auto n_coords_f = n_coords.toType(c10::ScalarType::Float);
 
         AT_DISPATCH_FLOATING_TYPES_AND_HALF(value_feats.scalar_type(), "self_attn_cuda_backward_kernel_indir", ([&] {
             using accscalar_t = acc_type<scalar_t>;
@@ -421,13 +433,13 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
                     query_table.data_ptr<scalar_t>(),
                     key_table.data_ptr<scalar_t>(),
                     value_table.data_ptr<scalar_t>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m2w_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w_elems.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2m_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m2w_indices_i.data_ptr<int32_t>(),
+                    w_elems_i.data_ptr<int32_t>(),
+                    w2m_offsets_i.data_ptr<int32_t>(),
+                    w2n_offsets_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     query_grads.data_ptr<scalar_t>(),
                     key_grads.data_ptr<scalar_t>(),
                     value_grads.data_ptr<scalar_t>(),
@@ -450,13 +462,13 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
                     query_table.data_ptr<scalar_t>(),
                     key_table.data_ptr<scalar_t>(),
                     value_table.data_ptr<scalar_t>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m2w_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w_elems.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2m_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m2w_indices_i.data_ptr<int32_t>(),
+                    w_elems_i.data_ptr<int32_t>(),
+                    w2m_offsets_i.data_ptr<int32_t>(),
+                    w2n_offsets_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     query_grads.data_ptr<scalar_t>(),
                     key_grads.data_ptr<scalar_t>(),
                     value_grads.data_ptr<scalar_t>(),
@@ -479,13 +491,13 @@ std::vector<torch::Tensor> self_attn_cuda_backward(
                     query_table.data_ptr<scalar_t>(),
                     key_table.data_ptr<scalar_t>(),
                     value_table.data_ptr<scalar_t>(),
-                    table_sizes.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    m2w_indices.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w_elems.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2m_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    w2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n2n_offsets.toType(c10::ScalarType::Int).data_ptr<int32_t>(),
-                    n_coords.toType(c10::ScalarType::Float).data_ptr<float>(),
+                    table_sizes_i.data_ptr<int32_t>(),
+                    m2w_indices_i.data_ptr<int32_t>(),
+                    w_elems_i.data_ptr<int32_t>(),
+                    w2m_offsets_i.data_ptr<int32_t>(),
+                    w2n_offsets_i.data_ptr<int32_t>(),
+                    n2n_offsets_i.data_ptr<int32_t>(),
+                    n_coords_f.data_ptr<float>(),
                     query_grads.data_ptr<scalar_t>(),
                     key_grads.data_ptr<scalar_t>(),
                     value_grads.data_ptr<scalar_t>(),
